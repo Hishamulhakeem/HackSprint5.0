@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solutions </title>
+    <style>
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-card: #252525;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3b3;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-agriculture: #22c55e;
+            --accent-healthcare: #3b82f6;
+            --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        header {
+            padding: 2.5rem 1rem;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        h1{
+            color: #fffefe;
+            font-size: 60px;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .home-button {
+            position: absolute;
+            left: -45%;
+            top: 20%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--bg-card);
+            transition: all 0.3s ease;
+        }
+        
+        .home-button:hover {
+            color: rgb(0, 255, 0);
+            background-color: var(--bg-secondary);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .theme-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .theme-card {
+            background-color: var(--bg-card);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            /* Make cards more rectangular and taller */
+            min-height: 600px;
+            max-height: 700px;
+        }
+
+        .theme-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-card.agriculture:hover {
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.3);
+        }
+
+        .theme-card.healthcare:hover {
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .card-img {
+            height: 450px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .agriculture .card-img {
+            background-image: url('./data/agri.jpg');
+            border-bottom: 3px solid var(--accent-agriculture);
+        }
+
+        .healthcare .card-img {
+            background-image: url('./data/health_care.jpg');
+            border-bottom: 3px solid var(--accent-healthcare);
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-title {
+            font-size: 1.0rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .theme-page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .problem-box {
+            background-color: var(--bg-card);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid;
+            display: flex;
+            flex-direction: column;
+            min-height: 400px;
+            max-height: 450px;
+        }
+        
+        .problem-img {
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        .problem-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .agriculture-page .problem-box {
+            border-color: var(--accent-agriculture);
+        }
+
+        .healthcare-page .problem-box {
+            border-color: var(--accent-healthcare);
+        }
+
+        .problem-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .problem-title {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        .problem-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .back-button:hover {
+            color: var(--text-primary);
+        }
+
+        .back-icon {
+            margin-right: 0.5rem;
+        }
+
+        .theme-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .theme-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .theme-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .problem-detail {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .problem-detail-header {
+            margin-bottom: 2rem;
+        }
+
+        .problem-detail-title {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .problem-full-description {
+            background-color: var(--bg-card);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .problem-full-description p {
+            margin-bottom: 1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .action-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .primary-button {
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+        }
+
+        .secondary-button {
+            background-color: #2a2a2a;
+            color: var(--text-primary);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .icon {
+            margin-right: 0.5rem;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .theme-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .problem-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="home-button" onclick="showMainPage()">
+                <img src="/static/images/home.png" alt="Home" width="30" height="30">
+            </div>
+            <div>
+                <h1 style="color:rgb(0, 255, 0)">Real-Time Solutions Panel</h1>
+                <p class="tagline" style="color:rgb(20, 189, 255)">Innovate. Impact. Inspire.</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="main-page">
+            <div class="theme-cards">
+                <div class="theme-card agriculture" onclick="showThemePage('agriculture')">
+                    <div class="card-img" style="background-image: url('/static/Mainimages/agri.jpg')"></div>
+                    <div class="card-content">
+                        <h2 class="card-title">Agriculture</h2>
+                        <p class="card-description">Transforming Farming with Data</p>
+                    </div>
+                </div>
+
+                <div class="theme-card healthcare" onclick="showThemePage('healthcare')">
+                    
+                </div>
+            </div>
+        </div>
+
+        <div id="agriculture-page" class="theme-page agriculture-page">
+            
+            <div class="theme-header">
+                <h2 class="theme-title">Agriculture Solutions</h2>
+                <p class="theme-description">Innovative approaches to transform modern farming</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-box" onclick="location.href='/Soilindex'">
+
+                    <div class="problem-img" style="background-image: url('/static/Mainimages/crop.jpg')"></div>
+                    <div class="problem-content">
+                        <h3 class="problem-title">Crop and Soil Management</h3>
+                        <p class="problem-description">Optimize crop yields with AI-driven soil analysis and precision farming techniques</p>
+                    </div>
+                </div>
+
+                <div class="problem-box" onclick="location.href='/diseaseIndex'">
+                    <div class="problem-img" style="background-image: url('/static/Mainimages/disease.jpg')"></div>
+                    <div class="problem-content">
+                        <h3 class="problem-title">AI-Driven Crop Disease Prediction</h3>
+                        <p class="problem-description">A smart solution that forecasts crop diseases using image and environmental data</p>
+                    </div>
+                </div>
+                <div class="problem-box" onclick="location.href='/Priceindex'">
+                    <div class="problem-img" style="background-image: url('/static/Mainimages/price.jpg')"></div>
+                    <div class="problem-content">
+                        <h3 class="problem-title">Predicting Prices of Agri-Horticultural Commodities</h3>
+                        <p class="problem-description">A data-driven approach to forecast agri-commodity prices</p>
+                    </div>
+                </div>
+                <div class="problem-box" onclick="showProblemDetail('agriculture', 'Air quality')">
+                    <div class="problem-img" style="background-image: url('/static/Mainimages/sat.jpg')"></div>
+                    <div class="problem-content">
+                        <h3 class="problem-title">Air quality Map</h3>
+                        <p class="problem-description">A model that transforms coarse satellite data into detailed air quality maps</p>
+                    </div>
+                </div>
+                <div class="problem-box" onclick="location.href='/chatbot'">
+                    <div class="problem-img" style="background-image: url('/static/Mainimages/bot.jpg')"></div>
+                    <div class="problem-content">
+                        <h3 class="problem-title">Q & A</h3>
+                        <p class="problem-description">ChatBot</p>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+
+
+
+        <!--
+        <div id="healthcare-page" class="theme-page healthcare-page">
+            
+            <div class="theme-header">
+                <h2 class="theme-title">Healthcare Solutions</h2>
+                <p class="theme-description">Cutting-edge technologies for better patient outcomes</p>
+            </div>
+            <div class="problem-grid">
+                <div class="problem-box" onclick="showProblemDetail('healthcare', 'diagnostics')">
+                    <div class="problem-img" style="background-image: url('/api/placeholder/400/320')"></div>
+                    <div class="problem-content">
+                        <h3 class="problem-title">AI-Powered Diagnostics</h3>
+                        <p class="problem-description">Machine learning models for early disease detection and accurate diagnosis</p>
+                    </div>
+                </div>
+                <div class="problem-box" onclick="showProblemDetail('healthcare', 'remote')">
+                    <div class="problem-img" style="background-image: url('/api/placeholder/400/320')"></div>
+                    <div class="problem-content">
+                        <h3 class="problem-title">Remote Patient Monitoring</h3>
+                        <p class="problem-description">IoT devices and cloud solutions for continuous health tracking outside clinical settings</p>
+                    </div>
+                </div>
+                <div class="problem-box" onclick="showProblemDetail('healthcare', 'medical')">
+                    <div class="problem-img" style="background-image: url('/api/placeholder/400/320')"></div>
+                    <div class="problem-content">
+                        <h3 class="problem-title">Medical Record Management</h3>
+                        <p class="problem-description">Secure, interoperable electronic health records with blockchain verification</p>
+                    </div>
+                </div>
+                <div class="problem-box" onclick="showProblemDetail('healthcare', 'emergency')">
+                    <div class="problem-img" style="background-image: url('/api/placeholder/400/320')"></div>
+                    <div class="problem-content">
+                        <h3 class="problem-title">Emergency Response Systems</h3>
+                        <p class="problem-description">Smart networks that optimize ambulance routing and resource allocation in crisis situations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        -->
+        
+        <div id="crop-soil-detail" class="problem-detail">
+            
+            <div class="problem-detail-header">
+                <!---->
+            </div>
+            <div class="problem-full-description">
+               <!---->
+            
+            </div>
+            
+        </div>
+    </main>
+
+    <script>
+        function showMainPage() {
+            document.querySelectorAll('.theme-page, .problem-detail').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById('main-page').style.display = 'block';
+        }
+
+        function showThemePage(theme) {
+            document.querySelectorAll('.theme-page, .problem-detail, #main-page').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById(`${theme}-page`).style.display = 'block';
+        }
+
+        function showProblemDetail(theme, problem) {
+            document.querySelectorAll('.theme-page, .problem-detail, #main-page').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            const problemPage = document.getElementById(`${problem}-detail`);
+            if (problemPage) {
+                problemPage.style.display = 'block';
+            } else {
+                showGenericProblemDetail(theme, problem);
+            }
+        }
+
+        function backToPreviousPage(theme) {
+            document.querySelectorAll('.problem-detail').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.getElementById(`${theme}-page`).style.display = 'block';
+        }
+        
+        function showGenericProblemDetail(theme, problem) {
+            // Hide all pages
+            document.querySelectorAll('.theme-page, .problem-detail, #main-page').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            const problemBoxes = document.querySelectorAll(`#${theme}-page .problem-box`);
+            let title = "Problem Detail";
+            let shortDesc = "";
+            
+            problemBoxes.forEach(box => {
+                if (box.getAttribute('onclick').includes(problem)) {
+                    title = box.querySelector('.problem-title').textContent;
+                    shortDesc = box.querySelector('.problem-description').textContent;
+                }
+            });
+            
+            const tempDetail = document.createElement('div');
+            tempDetail.className = 'problem-detail';
+            tempDetail.style.display = 'block';
+            tempDetail.innerHTML = `
+                <a class="back-button" onclick="backToPreviousPage('${theme}')">
+                    <span class="back-icon">←</span> Back to ${theme.charAt(0).toUpperCase() + theme.slice(1)} Solutions
+                </a>
+                <div class="problem-detail-header">
+                    <h2 class="problem-detail-title">${title}</h2>
+                </div>
+                <div class="problem-full-description">
+                    <p>${shortDesc}</p>
+                    <p>This is a detailed overview of the problem and our proposed solution. Our approach combines cutting-edge technology with practical implementation strategies to address real-world challenges.</p>
+                    <p>The system includes multiple components working together to provide a comprehensive solution, from data collection to analytics and actionable insights.</p>
+                </div>
+                <div class="action-buttons">
+                    <a href="#" class="action-button primary-button">
+                        <span class="icon">➜</span> View Demo
+                    </a>
+                    <a href="#" class="action-button secondary-button">
+                        <span class="icon">⌘</span> GitHub Repository
+                    </a>
+                </div>
+            `;
+        
+            document.querySelector('.container').appendChild(tempDetail);
+           
+            const backButton = tempDetail.querySelector('.back-button');
+            const originalOnClick = backButton.onclick;
+            backButton.onclick = function() {
+                originalOnClick();
+                tempDetail.remove();
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Prediction System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #8BC34A;
+            --accent-color: #FFC107;
+            --light-color: #F1F8E9;
+            --dark-color: #2E7D32;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --border-radius: 8px;
+            --background-color: #000000;
+            --box-color: #1a1a1a;
+            --input-color: #2a2a2a;
+            --text-color: #f1f1f1;
+            --border-color: #333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            padding: 20px 0;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            color: var(--text-color);
+        }
+        
+        .input-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            background-color: var(--box-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .input-group h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: border-color 0.3s;
+            background-color: var(--input-color);
+            color: var(--text-color);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+        
+        .option-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .option-card {
+            border: 2px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: var(--input-color);
+        }
+        
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .option-card.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(76, 175, 80, 0.2);
+        }
+        
+        .option-card img {
+            width: 50px;
+            height: 50px;
+            margin-bottom: 8px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .option-card p {
+            font-weight: 600;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+        
+        .btn-predict {
+            display: block;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-predict:hover {
+            background-color: var(--dark-color);
+        }
+        
+        .result-section {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--box-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            display: none;
+        }
+        
+        .result-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .result-title {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .crop-result {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 20px 0;
+        }
+        
+        .crop-image {
+            width: 300px;
+            height:300px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 5px solid var(--accent-color);
+            margin-bottom: 20px;
+        }
+        
+        .loader {
+            display: none;
+            margin: 20px auto;
+            border: 5px solid var(--border-color);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        .home-button {
+            position: absolute;
+            left: -45%;
+            top: 20%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-secondary);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--bg-card);
+            transition: all 0.3s ease;
+        }
+        
+        .home-button:hover {
+            color: rgb(0, 255, 0);
+            background-color: var(--bg-secondary);
+            transform: translateY(-50%) scale(1.1);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Enhanced Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .input-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            header p {
+                font-size: 1rem;
+            }
+            
+            .input-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .option-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .btn-predict {
+                padding: 12px;
+                font-size: 16px;
+            }
+            
+            .input-group {
+                padding: 15px;
+            }
+            
+            .crop-result {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="home-button" onclick="showMainPage()">
+                <img src="/static/images/home.png" alt="Home" width="30" height="30">
+            </div>
+            <h1><i class="fas fa-seedling"></i> Crop Prediction System</h1>
+            <p>Enter field conditions to get optimal crop recommendations</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="input-section">
+            <div class="input-group">
+                <h3>Environmental Factors</h3>
+                <div class="form-group">
+                    <label for="temperature">Temperature (°C)</label>
+                    <input type="number" id="temperature" class="form-control" placeholder="Enter temperature" required>
+                </div>
+                <div class="form-group">
+                    <label for="humidity">Humidity (%)</label>
+                    <input type="number" id="humidity" class="form-control" placeholder="Enter humidity" min="0" max="100" required>
+                </div>
+                <div class="form-group">
+                    <label for="moisture">Moisture (%)</label>
+                    <input type="number" id="moisture" class="form-control" placeholder="Enter moisture" min="0" max="100" required>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <h3>Soil Properties</h3>
+                <div class="form-group">
+                    <label>Soil Type</label>
+                    <div class="option-cards" id="soil-type-cards">
+                        <div class="option-card" data-value="Loamy">
+                            <img src="/static/images/Loamy.jpg" alt="Loamy Soil">
+                            <p>Loamy</p>
+                        </div>
+                        <div class="option-card" data-value="Red">
+                            <img src="/static/images/red.jpg" alt="Red Soil">
+                            <p>Red</p>
+                        </div>
+                        <div class="option-card" data-value="Alluvial">
+                            <img src="/static/images/alluvial.jpg" alt="Alluvial Soil">
+                            <p>Alluvial</p>
+                        </div>
+                        <div class="option-card" data-value="Black">
+                            <img src="/static/images/black.jpg" alt="Black Soil">
+                            <p>Black</p>
+                        </div>
+                        <div class="option-card" data-value="Clayey">
+                            <img src="/static/images/clayey.jpg" alt="Clayey Soil">
+                            <p>Clayey</p>
+                        </div>
+                        <div class="option-card" data-value="Sandy">
+                            <img src="/static/images/sandy.jpg" alt="Sandy Soil">
+                            <p>Sandy</p>
+                        </div>
+                    </div>
+                    <input type="hidden" id="soil-type">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <h3>Nutrients</h3>
+                <div class="form-group">
+                    <label for="nitrogen">Nitrogen (kg/ha)</label>
+                    <input type="number" id="nitrogen" class="form-control" placeholder="Enter nitrogen content" value="35">
+                </div>
+                <div class="form-group">
+                    <label for="potassium">Potassium (kg/ha)</label>
+                    <input type="number" id="potassium" class="form-control" placeholder="Enter potassium content" value="27">
+                </div>
+                <div class="form-group">
+                    <label for="phosphorous">Phosphorous (kg/ha)</label>
+                    <input type="number" id="phosphorous" class="form-control" placeholder="Enter phosphorous content" value="32">
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <h3>Geographic & Seasonal</h3>
+                <div class="form-group">
+                    <label>Season</label>
+                    <div class="option-cards" id="season-cards">
+                        <div class="option-card" data-value="Rabi">
+                            <img src="/static/images/Rabi.jpg" alt="Rabi Season">
+                            <p>Rabi</p>
+                        </div>
+                        <div class="option-card" data-value="Zaid">
+                            <img src="/static/images/Zaid.jpg" alt="Zaid Season">
+                            <p>Zaid</p>
+                        </div>
+                        <div class="option-card" data-value="Kharif">
+                            <img src="/static/images/Kharif1.jpg" alt="Kharif Season">
+                            <p>Kharif</p>
+                        </div>
+                    </div>
+                    <input type="hidden" id="season">
+                </div>
+                
+                <div class="form-group">
+                    <label>Region</label>
+                    <div class="option-cards" id="region-cards">
+                        <div class="option-card" data-value="South">
+                            <img src="/static/images/south.jpg" alt="South Region">
+                            <p>South</p>
+                        </div>
+                        <div class="option-card" data-value="North">
+                            <img src="/static/images/north.jpg" alt="North Region">
+                            <p>North</p>
+                        </div>
+                        <div class="option-card" data-value="East">
+                            <img src="/static/images/east.jpg" alt="East Region">
+                            <p>East</p>
+                        </div>
+                        <div class="option-card" data-value="Central">
+                            <img src="/static/images/center.jpg" alt="Central Region">
+                            <p>Central</p>
+                        </div>
+                        <div class="option-card" data-value="West">
+                            <img src="/static/images/west.jpg" alt="West Region">
+                            <p>West</p>
+                        </div>
+                    </div>
+                    <input type="hidden" id="region">
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn-predict" id="predict-btn">
+            <i class="fas fa-leaf"></i> Predict Optimal Crop
+        </button>
+        
+        <div class="loader" id="loader"></div>
+        
+        <div class="result-section" id="result-section">
+            <h2 class="result-title">Recommended Crop</h2>
+            <img src="/api/placeholder/150/150" alt="Crop" class="crop-image" id="crop-image">
+            <h3 class="crop-result" id="crop-result">Loading...</h3>
+            <p id="crop-description">This crop is well-suited for your field conditions.</p>
+        </div>
+    </div>
+
+    <script>
+        function setupOptionCards(containerID, hiddenInputID) {
+            const container = document.getElementById(containerID);
+            const hiddenInput = document.getElementById(hiddenInputID);
+            
+            if (!container || !hiddenInput) return;
+            
+            const cards = container.querySelectorAll('.option-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    cards.forEach(c => c.classList.remove('selected'));
+                    
+                    card.classList.add('selected');
+                    
+                    hiddenInput.value = card.dataset.value;
+                });
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupOptionCards('soil-type-cards', 'soil-type');
+            setupOptionCards('season-cards', 'season');
+            setupOptionCards('region-cards', 'region');
+
+            document.querySelectorAll('#soil-type-cards .option-card')[0].click();
+            document.querySelectorAll('#season-cards .option-card')[0].click();
+            document.querySelectorAll('#region-cards .option-card')[0].click();
+        });
+
+        document.getElementById('predict-btn').addEventListener('click', async () => {
+
+            const temperature = document.getElementById('temperature').value;
+            const humidity = document.getElementById('humidity').value;
+            const moisture = document.getElementById('moisture').value;
+            const soilType = document.getElementById('soil-type').value;
+            const nitrogen = document.getElementById('nitrogen').value;
+            const potassium = document.getElementById('potassium').value;
+            const phosphorous = document.getElementById('phosphorous').value;
+            const season = document.getElementById('season').value;
+            const region = document.getElementById('region').value;
+            
+
+            if (!temperature || !humidity || !moisture || !soilType || !nitrogen || 
+                !potassium || !phosphorous || !season || !region) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('result-section').classList.remove('active');
+            
+            const data = {
+                Temperature: parseFloat(temperature),
+                Humidity: parseFloat(humidity),
+                Moisture: parseFloat(moisture),
+                'Soil Type': soilType,
+                Nitrogen: parseFloat(nitrogen),
+                Potassium: parseFloat(potassium),
+                Phosphorous: parseFloat(phosphorous),
+                Season: season,
+                Region: region
+            };
+
+            try {
+                document.getElementById('loader').style.display = 'block';
+                
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Unknown error occurred');
+                }
+                
+                const predictedCrop = result.prediction;
+                
+                document.getElementById('crop-result').textContent = predictedCrop;
+                
+                const cropImageName = predictedCrop.toLowerCase().replace(/\s+/g, '_');
+                document.getElementById('crop-image').src = `/static/images/${cropImageName}.jpg`;
+                
+                let cropDescription = "This crop is well-suited for your field conditions.";
+                
+                const cropDescriptions = {
+                    'wheat': "Wheat grows best in cool, dry climates with well-drained loamy soil and moderate irrigation.\n\tTip: Avoid waterlogging and sow during winter for optimal yield.",
+                    'tobacco': "Tobacco thrives in sandy loam soil with warm, dry weather and light, frequent watering.\nTip: Proper leaf curing after harvest is essential for quality.",
+                    'sugarcane': "Sugarcane requires deep fertile soil, hot and humid climate, and heavy, regular irrigation.\nTip: Timely weed control and nutrient management ensure better yields.",
+                    'millets': "Millets grow well in hot, dry conditions and poor, sandy soils with minimal water.\nTip: Best suited for rainfed and semi-arid areas with low input costs.",
+                    'ground nuts': "Groundnuts prefer sandy loam soil, warm climate, and moderate rainfall with good drainage.\nTip: Calcium-rich soil boosts pod development significantly.",
+                    'cotton': "Cotton needs black or loamy soil, high temperatures, and regular watering during flowering.\nTip: Early pest monitoring is key to avoiding bollworm damage.",
+                    'barley': "Barley grows well in cool climates and light to medium loam soil with moderate irrigation.\nTip: Suitable for winter sowing and quick to mature.",
+                    'maize': "Maize thrives in well-drained fertile soil, warm weather, and good sunlight with medium water.\nTip: Apply nitrogen in split doses for healthy growth.",
+                    'pulses': "Pulses grow in light, well-drained soil and require a warm climate with low to moderate water.\nTip: Ideal for crop rotation due to their nitrogen-fixing ability.",
+                    'rice': "Rice needs clayey or loamy soil, hot and humid weather, and standing water throughout growth.\nTip: Maintain proper field leveling to ensure uniform water coverage",
+                    'oil seeds': "Oil seeds (like mustard, sunflower) need loamy soil and moderate temperature with low to moderate irrigation.\nTip: Ensure timely sowing and avoid excessive nitrogen to enhance oil content."
+                };
+               
+                if (cropDescriptions[cropImageName]) {
+                    cropDescription = cropDescriptions[cropImageName];
+                }
+                
+                document.getElementById('crop-description').textContent = cropDescription;
+                document.getElementById('result-section').classList.add('active');
+            } catch (error) {
+                console.error('Error during prediction:', error);
+                alert('An error occurred during prediction. Please try again.');
+            } finally {
+            
+                document.getElementById('loader').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Disease Predictor</title>
+    <style>
+        :root {
+            --primary-green: #2ecc71;
+            --dark-green: #27ae60;
+            --light-green: #a3f7bf;
+            --dark-bg: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #f0f0f0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-bg);
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0;
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background-color: var(--primary-green);
+            color: #000;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        
+        .content-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 25px;
+        }
+        
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgba(46, 204, 113, 0.05);
+        }
+        
+        .input-methods {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .file-input-wrapper {
+            position: relative;
+            flex-grow: 1;
+            min-width: 200px;
+        }
+        
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-input-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--text-color);
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-green);
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .file-input-button:hover {
+            background-color: rgba(46, 204, 113, 0.2);
+        }
+        
+        .camera-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--text-color);
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-green);
+            cursor: pointer;
+            flex-grow: 1;
+            min-width: 200px;
+            transition: all 0.3s ease;
+        }
+        
+        .camera-button:hover {
+            background-color: rgba(46, 204, 113, 0.2);
+        }
+        
+        .preview-container {
+            display: flex;
+            justify-content: center;
+            margin: 15px 0;
+            min-height: 180px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px dashed var(--primary-green);
+            background-color: rgba(46, 204, 113, 0.05);
+            position: relative;
+        }
+        
+        .preview-container .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-size: 14px;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
+        }
+        
+        .preview-container img {
+            max-width: 100%;
+            max-height: 300px;
+            display: none;
+        }
+        
+        #camera-feed {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: none;
+        }
+        
+        .button {
+            background-color: var(--primary-green);
+            color: #000;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        .button:hover {
+            background-color: var(--dark-green);
+            transform: translateY(-2px);
+        }
+        
+        .button:active {
+            transform: translateY(0);
+        }
+        
+        .button:disabled {
+            background-color: #666;
+            cursor: not-allowed;
+        }
+        
+        .output-container {
+            background-color: rgba(46, 204, 113, 0.05);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .result-header h3 {
+            margin: 0;
+            color: var(--primary-green);
+        }
+        
+        .video-container {
+            margin-top: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .video-container video {
+            width: 100%;
+            border-radius: 10px;
+        }
+        
+        .camera-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+        }
+        
+        .camera-controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .icon {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+        
+        /* Loading spinner */
+        .loading {
+            display: none;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(46, 204, 113, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-green);
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 20px 10px;
+            }
+            
+            .input-methods {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Crop Disease Predictor</h2>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="input-container">
+                <div class="input-methods">
+                    <div class="file-input-wrapper">
+                        <div class="file-input-button">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="17 8 12 3 7 8"></polyline>
+                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                            </svg>
+                            Upload Image
+                        </div>
+                        <input type="file" id="image-input" accept="image/*">
+                    </div>
+                    
+                    <button class="camera-button" id="camera-button">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <circle cx="12" cy="13" r="4"></circle>
+                        </svg>
+                        Take Photo
+                    </button>
+                </div>
+                
+                <div class="preview-container" id="preview-container">
+                    <div class="placeholder">
+                        <svg class="icon" viewBox="0 0 24 24" style="width: 48px; height: 48px; margin-bottom: 10px; opacity: 0.5;">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21 15 16 10 5 21"></polyline>
+                        </svg>
+                        <span>Image preview will appear here</span>
+                    </div>
+                    <img id="preview-image" src="" alt="Preview">
+                </div>
+                
+                <button class="button" id="predict-button" disabled>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polygon points="10 8 16 12 10 16 10 8"></polygon>
+                    </svg>
+                    Predict Disease
+                </button>
+            </div>
+            
+            <div class="loading">
+                <div class="spinner"></div>
+            </div>
+            
+            <div class="output-container">
+                <div class="result-header">
+                    <svg class="icon" viewBox="0 0 24 24" style="color: var(--primary-green);">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <h3 id="output-header">Results will appear here</h3>
+                </div>
+                <p id="output-text">Upload an image and click the Predict button to analyze crop disease.</p>
+                
+                <div class="video-container" id="video-container">
+                    <video id="disease-video" controls>
+                        <source src="" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="camera-modal" id="camera-modal">
+        <video id="camera-feed" autoplay></video>
+        <div class="camera-controls">
+            <button class="button" id="capture-button">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10"></circle>
+                </svg>
+                Capture
+            </button>
+            <button class="button" id="close-camera-button" style="background-color: #e74c3c;">
+                <svg class="icon" viewBox="0 0 24 24">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                Close
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const predictButton = document.getElementById('predict-button');
+        const imageInput = document.getElementById('image-input');
+        const cameraButton = document.getElementById('camera-button');
+        const previewContainer = document.getElementById('preview-container');
+        const previewImage = document.getElementById('preview-image');
+        const outputHeader = document.getElementById('output-header');
+        const outputText = document.getElementById('output-text');
+        const videoContainer = document.getElementById('video-container');
+        const diseaseVideo = document.getElementById('disease-video');
+        const cameraModal = document.getElementById('camera-modal');
+        const cameraFeed = document.getElementById('camera-feed');
+        const captureButton = document.getElementById('capture-button');
+        const closeCameraButton = document.getElementById('close-camera-button');
+        const loadingSpinner = document.querySelector('.loading');
+        const placeholder = document.querySelector('.placeholder');
+        
+        // Variables for camera
+        let stream = null;
+        let capturedImage = null;
+        
+        // Map of diseases to video files
+        const diseaseVideos = {
+             "scab": "static/videos/1.mp4",  
+        "Black_rot": "static/videos/2.mp4",
+        "Cedar_apple_rust": "static/videos/3.mp4",
+        "healthy": "static/videos/4.mp4",
+        "Blueberry___healthy": "static/videos/5.mp4",
+        "Powdery_mildew": "static/videos/6.mp4", 
+        "Cherry___healthy": "static/videos/4.mp4",
+        "Cercospora_leaf_spot Gray_leaf_spot": "static/videos/7.mp4",
+        "Common_rust_": "static/videos/1.mp4",
+        "Northern_Leaf_Blight": "static/videos/3.mp4",
+        "Corn___healthy": "static/videos/4.mp4",
+        "Black_rot": "static/videos/2.mp4",
+        "Esca(Black_Measles)": "static/videos/5.mp4",
+        "Leaf_blight(Isariopsis_Leaf_Spot)": "static/videos/7.mp4",
+        "Grape___healthy": "static/videos/4.mp4",
+        "Haunglongbing(Citrus_greening)": "static/videos/1.mp4",
+        "Bacterial_spot": "static/videos/2.mp4",
+        "Peach___healthy": "static/videos/4.mp4",
+        "Bacterial_spot": "static/videos/2.mp4",
+        "Pepper,bell__healthy": "static/videos/4.mp4",
+        "Early_blight": "static/videos/6.mp4",
+        "Late_blight": "static/videos/7.mp4",
+        "Potato___healthy": "static/videos/4.mp4",
+        "Raspberry___healthy": "static/videos/4.mp4",
+        "Soybean___healthy": "static/videos/4.mp4",
+        "Powdery_mildew": "static/videos/3.mp4",
+        "Leaf_scorch": "static/videos/5.mp4",
+        "Strawberry___healthy": "static/videos/4.mp4",
+        "Bacterial_spot": "static/videos/2.mp4",
+        "Early_blight": "static/videos/6.mp4",
+        "Late_blight": "static/videos/7.mp4",
+        "Leaf_Mold": "static/videos/3.mp4",
+        "Septoria_leaf_spot": "static/videos/4.mp4",
+        "Spider_mites Two-spotted_spider_mite": "static/videos/5.mp4",
+        "Target_Spot": "static/videos/6.mp4",
+        "Tomato_Yellow_Leaf_Curl_Virus": "static/videos/1.mp4",
+        "Tomato_mosaic_virus": "static/videos/2.mp4",
+        };
+        
+        // Initialize
+        function init() {
+            // Event listeners
+            imageInput.addEventListener('change', handleImageSelect);
+            predictButton.addEventListener('click', predictDisease);
+            cameraButton.addEventListener('click', openCamera);
+            captureButton.addEventListener('click', captureImage);
+            closeCameraButton.addEventListener('click', closeCamera);
+        }
+        
+        // Handle image selection from file input
+        function handleImageSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                displayPreviewImage(file);
+                predictButton.disabled = false;
+            }
+        }
+        
+        // Display preview image
+        function displayPreviewImage(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+                previewImage.style.display = 'block';
+                placeholder.style.display = 'none';
+                capturedImage = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Open camera
+        function openCamera() {
+            cameraModal.style.display = 'flex';
+            
+            // Access the camera
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function(mediaStream) {
+                    stream = mediaStream;
+                    cameraFeed.srcObject = mediaStream;
+                    cameraFeed.style.display = 'block';
+                })
+                .catch(function(error) {
+                    console.error('Error accessing camera:', error);
+                    alert('Unable to access camera. Please ensure you have camera permissions enabled.');
+                    cameraModal.style.display = 'none';
+                });
+        }
+        
+        // Capture image from camera
+        function captureImage() {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            
+            // Set canvas dimensions to match video
+            canvas.width = cameraFeed.videoWidth;
+            canvas.height = cameraFeed.videoHeight;
+            
+            // Draw current video frame to canvas
+            context.drawImage(cameraFeed, 0, 0, canvas.width, canvas.height);
+            
+            // Convert canvas to data URL
+            capturedImage = canvas.toDataURL('image/jpeg');
+            
+            // Display the captured image
+            previewImage.src = capturedImage;
+            previewImage.style.display = 'block';
+            placeholder.style.display = 'none';
+            
+            // Close camera and enable predict button
+            closeCamera();
+            predictButton.disabled = false;
+        }
+        
+        // Close camera
+        function closeCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            cameraFeed.srcObject = null;
+            cameraModal.style.display = 'none';
+        }
+        
+        // Convert base64 to blob for form submission
+        function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            
+            return new Blob([ab], { type: mimeString });
+        }
+        
+        // Predict disease
+        function predictDisease() {
+    if (!capturedImage && !imageInput.files[0]) {
+        alert('Please select or capture an image first');
+        return;
+    }
+
+    loadingSpinner.style.display = 'flex';
+    const formData = new FormData();
+
+    if (imageInput.files[0]) {
+        formData.append('image', imageInput.files[0]);
+    } else {
+        const blob = dataURItoBlob(capturedImage);
+        formData.append('image', blob, 'camera_image.jpg');
+    }
+
+    fetch('/predict2', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        loadingSpinner.style.display = 'none';
+
+        if (data.success) {
+            const rawPrediction = data.prediction;
+            const diseaseName = rawPrediction.replace(/_/g, ' '); // Format for display
+
+            outputHeader.innerText = `Disease: ${diseaseName}`;
+            outputText.innerText = `This appears to be a case of ${diseaseName}. Below is an informational video about this disease and how to treat it.`;
+
+            const videoFile = diseaseVideos[rawPrediction];
+            if (videoFile) {
+                diseaseVideo.src = videoFile;
+                videoContainer.style.display = 'block';
+                diseaseVideo.load();
+            } else {
+                videoContainer.style.display = 'none';
+                outputText.innerText += `\n(Note: No video found for "${rawPrediction}")`;
+            }
+        } else {
+            outputHeader.innerText = 'Prediction failed';
+            outputText.innerText = data.error || 'Unknown error';
+            videoContainer.style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        loadingSpinner.style.display = 'none';
+        outputHeader.innerText = 'Error';
+        outputText.innerText = 'An error occurred during prediction. Please try again.';
+        videoContainer.style.display = 'none';
+    });
+}
+
+           
+        
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>

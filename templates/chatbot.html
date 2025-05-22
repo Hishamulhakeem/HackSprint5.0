@@ -1,0 +1,33 @@
+<!-- templates/chatbot.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SoilBot</title>
+</head>
+<body>
+    <h2>Ask the SoilBot</h2>
+    <div id="chat-box"></div>
+    <input type="text" id="user-input" placeholder="Type your message...">
+    <button onclick="sendMessage()">Send</button>
+
+    <script>
+        async function sendMessage() {
+            const input = document.getElementById('user-input').value;
+            const res = await fetch('/chatbot', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message: input })
+            });
+            const data = await res.json();
+            const chatBox = document.getElementById('chat-box');
+            if (data.success) {
+                chatBox.innerHTML += `<p><b>You:</b> ${input}</p>`;
+                chatBox.innerHTML += `<p><b>Bot:</b> ${data.response}</p>`;
+            } else {
+                chatBox.innerHTML += `<p style="color:red;">Error: ${data.error}</p>`;
+            }
+            document.getElementById('user-input').value = '';
+        }
+    </script>
+</body>
+</html>
